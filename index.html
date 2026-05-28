@@ -18,7 +18,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            gap: 30px;
+            /* height: 100vh; */
+            min-height: 100vh;
             margin: 0;
         }
 
@@ -44,6 +46,8 @@
             border-radius: 8px;
             cursor: pointer;
             margin-top: 10px;
+            background: #ffd700;
+            font-weight: 700;
         }
 
         .success {
@@ -196,11 +200,138 @@
             gap: 20px;
             margin-top: 15px;
         }
+
+        .leaderboard {
+            width: 250px;
+            background: #1e1e1e;
+            border-radius: 12px;
+            padding: 15px;
+            height: 500px;
+            overflow-y: auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .leaderboard h3 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+
+        .lb-item {
+            padding: 8px;
+            margin: 5px 0;
+            background: #151515;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .auth {
+            position: absolute;
+            background: #1e1e1e;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            width: 350px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .auth input {
+            box-sizing: border-box;
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px 0;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+            background: aliceblue;
+            padding-left: 10px;
+        }
+
+
+        .box {
+            display: none;
+        }
+
+        .button-st {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .leaderboard {
+            display: none;
+        }
+
+
+        @media (max-width: 768px) {
+
+            body {
+                flex-direction: column;
+                height: auto;
+                padding: 20px 10px;
+                gap: 15px;
+                background-size: cover;
+            }
+
+            .box {
+                width: 100%;
+                max-width: 420px;
+                padding: 20px;
+            }
+
+            .leaderboard {
+                width: 100%;
+                max-width: 420px;
+                height: 300px;
+            }
+
+            .item {
+                font-size: 22px;
+            }
+
+            button {
+                width: 100%;
+                font-size: 16px;
+            }
+
+            .calj {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .auth {
+                width: 90%;
+                max-width: 350px;
+            }
+
+            html,
+            body {
+                overflow-x: hidden;
+            }
+
+            button {
+                min-height: 44px;
+            }
+        }
     </style>
 </head>
 
 <body>
 
+    <div class="auth" id="authBox">
+
+        <h2>ЗАРЕЄСТРУЙСА І АВТОРИЗУЙСА, ФРАЄРОК</h2>
+
+        <input id="nickname" placeholder="Login" />
+        <input id="password" placeholder="Password" type="password" />
+
+        <div class="button-st" style="margin-top:10px;">
+            <button onclick="login()">Авторизація</button>
+            <button onclick="register()">Реєстрація</button>
+        </div>
+
+    </div>
     <div class="box">
 
         <h1>Slayer PWNZ Заточка</h1>
@@ -254,11 +385,11 @@
                 <span class="checkmark"></span>
                 Нєбєска
             </label>
-            <label class="custom-check">
+            <!-- <label class="custom-check">
                 <input type="checkbox" id="dragonOrb">
                 <span class="checkmark"></span>
                 Шар Дракона
-            </label>
+            </label> -->
         </div>
 
 
@@ -270,12 +401,55 @@
 
     </div>
 
+    <div class="leaderboard" id="leaderboard">
+        <h3>Атець заточкі єбать</h3>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script>
 
+        //-------------------- NoMercyPWNZ1337's Project
+        //-------------------- https://czfzowtkkgigfqgvbqid.supabase.co/rest/v1/users
+        //--------------------  e2h@B?kb6DAMr?z ------------------------
+
+        const supabaseUrl = "https://czfzowtkkgigfqgvbqid.supabase.co";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6Znpvd3Rra2dpZ2ZxZ3ZicWlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NDYzNDAsImV4cCI6MjA5NTUyMjM0MH0.zgCChQxF7VAFHT08KLC0ZhGYMGEwmdd3qtq8ObDN5zI";
+
+        const client = supabase.createClient(supabaseUrl, supabaseKey);
+
+        let currentUser = null;
+
+        async function loginUser(nickname, password) {
+
+            const { data, error } = await client
+                .from("users")
+                .select("*")
+                .eq("nickname", nickname)
+                .eq("password", password)
+                .single();
+
+            if (error || !data) {
+                console.log("Login failed", error);
+                return;
+            }
+
+            currentUser = data;
+
+            console.log("Logged in:", currentUser);
+
+            loadProgress();
+            loadLeaderboard();
+        }
+        // let items = [
+        //     { name: "Шмотка 1", level: 0 },
+        //     { name: "Шмотка 2", level: 0 },
+        //     { name: "Шмотка 3", level: 0 }
+        // ];
         let items = [
-            { name: "Шмотка 1", level: 0 },
-            { name: "Шмотка 2", level: 0 },
-            { name: "Шмотка 3", level: 0 }
+            { name: "Шмотка 1", level: 0, maxLevel: 0 },
+            { name: "Шмотка 2", level: 0, maxLevel: 0 },
+            { name: "Шмотка 3", level: 0, maxLevel: 0 }
         ];
 
         let selectedItem = 0;
@@ -303,8 +477,8 @@
 
         function getChance(level) {
 
-            let dragon = document.getElementById("dragonOrb").checked;
-            if (dragon) return 100;
+            // let dragon = document.getElementById("dragonOrb").checked;
+            // if (dragon) return 100;
 
             let heaven = document.getElementById("heavenStone").checked;
 
@@ -352,23 +526,42 @@
             let chance = getChance(nextLevel);
             // let random = Math.random() * 100;
             rngSeed += Date.now() % 100;
-            let random = pwRandom(); 
+            let random = pwRandom();
+
+            // if (random < chance) {
+
+            //     item.level++;
+
+            //     addHistory(`<div class="success">${item.name} Заточив фраєрок до +${item.level}</div>`);
+
+            // } else {
+
+            //     item.level = 0;
+
+            //     addHistory(`<div class="fail">${item.name} ЗБИВ ФРАЄРОК ДО +0</div>`);
+            // }
 
             if (random < chance) {
 
                 item.level++;
 
-                addHistory(`<div class="success">${item.name} Заточив фраєрок до +${item.level}</div>`);
+                if (item.level > item.maxLevel) {
+                    item.maxLevel = item.level;
+                }
+
+                addHistory(`<div class="success">${item.name} Заточив до +${item.level}</div>`);
 
             } else {
 
                 item.level = 0;
 
-                addHistory(`<div class="fail">${item.name} ЗБИВ ФРАЄРОК ДО +0</div>`);
+                addHistory(`<div class="fail">${item.name} ЗБИВ ДО +0</div>`);
             }
 
             updateUI();
             updateLevelsUI();
+            saveProgress();
+            loadLeaderboard();
         }
 
         function addHistory(text) {
@@ -403,22 +596,187 @@
         }
 
         // чекбокс
-        document.getElementById("dragonOrb").addEventListener("change", function () {
-            if (this.checked) {
-                document.getElementById("heavenStone").checked = false;
-            }
-            updateChanceText();
-        });
-
         document.getElementById("heavenStone").addEventListener("change", function () {
-            if (this.checked) {
-                document.getElementById("dragonOrb").checked = false;
-            }
             updateChanceText();
         });
+        // document.getElementById("heavenStone").addEventListener("change", function () {
+        //     document.getElementById("dragonOrb").checked = false;
+        //     updateChanceText();
+        // });
+
+        // document.getElementById("dragonOrb").addEventListener("change", function () {
+        //     document.getElementById("heavenStone").checked = false;
+        //     updateChanceText();
+        // });
+        // document.getElementById("dragonOrb").addEventListener("change", function () {
+        //     if (this.checked) {
+        //         document.getElementById("heavenStone").checked = false;
+        //     }
+        //     updateChanceText();
+        // });
+
+        // document.getElementById("heavenStone").addEventListener("change", function () {
+        //     if (this.checked) {
+        //         document.getElementById("dragonOrb").checked = false;
+        //     }
+        //     updateChanceText();
+        // });
+        function loadProgress() {
+
+            items.forEach(item => {
+                item.level = 0;
+                item.maxLevel = currentUser.max_enchant; // тільки рекорд
+            });
+
+            updateUI();
+        }
+        async function saveProgress() {
+
+            if (!currentUser) return;
+
+            const maxLevel = Math.max(...items.map(i => i.maxLevel));
+
+            const { error } = await client
+                .from("users")
+                .update({ max_enchant: maxLevel })
+                .eq("id", currentUser.id);
+
+            if (error) {
+                console.log("Save error:", error);
+            }
+        }
+
+        async function loadLeaderboard() {
+
+            const { data, error } = await client
+                .from("users")
+                .select("nickname, max_enchant")
+                .order("max_enchant", { ascending: false })
+                .limit(10);
+
+            if (error) {
+                console.log(error);
+                return;
+            }
+
+            const lb = document.getElementById("leaderboard");
+            lb.innerHTML = "<h3>Атець заточкі єбать</h3>";
+
+            data.forEach((user, index) => {
+
+                const div = document.createElement("div");
+                div.className = "lb-item";
+
+                div.innerHTML = `
+            <span>${index + 1}. ${user.nickname}</span>
+            <span>+${user.max_enchant}</span>
+        `;
+
+                lb.appendChild(div);
+            });
+        }
+        async function registerUser(nickname, password) {
+
+            const { error } = await client
+                .from("users")
+                .insert([
+                    {
+                        nickname,
+                        password,
+                        max_enchant: 0
+                    }
+                ]);
+
+            if (error) {
+                console.log("Register error:", error);
+                return;
+            }
+
+            console.log("Registered!");
+        }
+        function showGame() {
+            document.getElementById("authBox").style.display = "none";
+            document.querySelector(".box").style.display = "block";
+            document.getElementById("leaderboard").style.display = "block";
+            initGame();
+        }
+        async function login() {
+
+            const nickname = document.getElementById("nickname").value.trim();
+            const password = document.getElementById("password").value.trim();
+
+            if (!nickname || !password) {
+                alert("Введи логін і пароль");
+                return;
+            }
+
+            const { data, error } = await client
+                .from("users")
+                .select("*")
+                .eq("nickname", nickname)
+                .eq("password", password)
+                .single();
+
+            if (error || !data) {
+                alert("Невірний логін або пароль");
+                return;
+            }
+
+            currentUser = data;
+
+            loadProgress();
+            loadLeaderboard();
+            showGame();
+        }
+
+        async function register() {
+
+            const nickname = document.getElementById("nickname").value.trim();
+            const password = document.getElementById("password").value.trim();
+
+            // 🔴 перевірка порожніх полів
+            if (!nickname || !password) {
+                alert("Введи логін і пароль");
+                return;
+            }
+
+            // 🔴 мінімальна довжина
+            if (nickname.length < 3) {
+                alert("Логін має бути мінімум 3 символи");
+                return;
+            }
+
+            if (password.length < 4) {
+                alert("Пароль має бути мінімум 4 символи");
+                return;
+            }
+
+            const { error } = await client
+                .from("users")
+                .insert([
+                    {
+                        nickname,
+                        password,
+                        max_enchant: 0
+                    }
+                ]);
+
+            if (error) {
+                alert("Такий логін вже існує або помилка");
+                return;
+            }
+
+            alert("Акаунт створено! Тепер увійди.");
+        }
 
         updateUI();
+        function updateAllUI() {
+            updateChanceText();
+            updateLevelsUI();
+        }
+        updateAllUI();
         // updateLevelsUI();
+        // loginUser("Alex", "12345");
 
     </script>
 
